@@ -65,6 +65,8 @@ static int framesCounter = 0;
 static bool gameOver = true;
 static bool pause = false;
 static bool start = true;
+static bool personnalise = false;
+
 static bool avecTraverser = false;
 static bool avecObstacle = false;
 
@@ -79,6 +81,8 @@ static Vector2 offset = { 0 };
 static int counterTail = 0;
 static int score = 0;
 static int bestScore = 0;
+static int fps = 30;
+
 
 
 
@@ -95,7 +99,7 @@ static void UpdateDrawFrame(void);  // Update and Draw (one frame)
 //------------------------------------------------------------------------------------
 // Nouvelles fonction implémentées
 //------------------------------------------------------------------------------------
-void Convert(int Nb, char* NombreaEcrire)// Converti un int en char* pour l'affichage
+void convert(int Nb, char* NombreaEcrire)// Converti un int en char* pour l'affichage
 {
 	int Puissance, chiffre, i;
 	bool HasWriteNumber;
@@ -163,11 +167,61 @@ void collisionFruit()
 	score += 1;
 	if (score >= bestScore) bestScore = score;
 }
-void parametres() {
+void personnaliser() {
 
-	BeginDrawing();
+	ClearBackground(WHITE);
+	DrawText("PERSONNALISER", screenWidth / 2 - MeasureText("PERSONNALISER", 30) / 2 - 50, 50, 30, BLACK);
 
-	ClearBackground(RAYWHITE);
+	//Affichage obstacle
+	DrawText("Obstacles : ", screenWidth / 4 - MeasureText("SNAKE", 40) / 2 - 50, 150, 30, BLACK);
+	DrawText("[O]", screenWidth / 2 + 150, 150, 30, BLACK);
+	if(avecObstacle) 	DrawText("Oui ", screenWidth / 2, 150, 30, GREEN);
+	else DrawText("Non", screenWidth / 2 , 150, 30, RED);
+
+	//Affichage traverser les murs
+	DrawText("Traverser les murs : ", screenWidth / 4 - MeasureText("SNAKE", 40) / 2 - 50, 200, 30, BLACK);
+	DrawText("[T]", screenWidth / 2 + 150, 200, 30, BLACK);
+	if (avecTraverser) 	DrawText("Oui ", screenWidth / 2, 200, 30, GREEN);
+	else DrawText("Non", screenWidth / 2 , 200, 30, RED);
+
+	//Affichage vitesse
+	DrawText("Vitesse : ", screenWidth / 4 - MeasureText("SNAKE", 40) / 2 - 50, 250, 30, BLACK);
+
+	const char* fpss = malloc(sizeof(int));
+	convert(fps, fpss);
+	if(fps<30) DrawText(fpss, screenWidth / 2, 250, 30, BLUE);
+	else if(fps>=30 && fps <=60) DrawText(fpss, screenWidth / 2, 250, 30, GREEN);
+	else if(fps>60) DrawText(fpss, screenWidth / 2, 250, 30, RED);
+	free(fpss);
+
+	//Affichage touches
+	DrawText("[M] pour le Menu", screenWidth / 8, screenHeight-50, 20, GRAY);
+	DrawText("[ENTREE] pour lancer", screenWidth - MeasureText("[ENTREE] pour lancer", 20)- 125, screenHeight - 50, 20, GRAY);
+
+	if (IsKeyPressed('O')) avecObstacle = !avecObstacle;
+	else if (IsKeyPressed('T')) avecTraverser = !avecTraverser;
+
+	else if (IsKeyPressed(KEY_LEFT) && fps > 0) fps -= 5;
+	else if (IsKeyPressed(KEY_LEFT) && fps == 0) fps = 0;
+	else if (IsKeyPressed(KEY_RIGHT) && fps < 120) fps += 5;
+
+	else if (IsKeyPressed(KEY_SEMICOLON)) // Equivalent de la touche [M] en AZERTY
+	{
+		start = true;
+		personnalise = false;
+		gameOver = true;
+	}
+
+
+	else if (IsKeyPressed(KEY_ENTER) && fps > 0 )
+	{
+		InitGame();
+		SetTargetFPS(fps);
+		start = false;
+		personnalise = false;
+	}
+	else if (fps == 0)
+		DrawText("Veuillez entrer une vitesse superieure a 0", screenWidth / 4, screenHeight - 100, 20, RED);
 
 }
 void lireFichierScore()
@@ -189,63 +243,55 @@ void modifierFichierScore() {
 	FILE* fichier;
 	fichier = fopen(nomFichier, "r+");
 	fscanf(fichier, "%u\n", &bestScore);
-	if (score > bestScore) {
+	if (score > bestScore)
+	{
 		const char* scoreChar = (const char*)malloc(sizeof(int));
-		Convert(score, scoreChar);
+		convert(score, scoreChar);
 		fseek(fichier, SEEK_SET, 0);
 		fputs(scoreChar, fichier);
 		free(scoreChar);
 	}
 	fclose(fichier);
-
+	score = 0;
 }
 void menuPrincipal()
 {
-	BeginDrawing();
-
 	ClearBackground(SKYBLUE);
 
 	DrawText("SNAKE", screenWidth / 2 - MeasureText("SNAKE", 40) / 2 - 50, 100, 40, RED);
-	DrawText("FACILE : [F]", screenWidth / 2 - MeasureText("FACILE : [F]", 40) / 2, screenHeight / 2 + 20, 25, GRAY);
-	DrawText("INTERMEDIAIRE : [I]", screenWidth / 2 - MeasureText("INTERMEDIAIRE : [I]", 40) / 2, screenHeight / 2 + 60, 25, GRAY);
-	DrawText("DIFFICILE :[D]", screenWidth / 2 - MeasureText("DIFFICILE :[D]", 40) / 2, screenHeight / 2 + 100, 25, GRAY);
-	DrawText("PERSONNALISE: [P]", screenWidth / 2 - MeasureText("PERSONNALISE: [P]", 40) / 2, screenHeight / 2 + 140, 25, GRAY);
+	DrawText("FACILE :      [F]", screenWidth / 2 - MeasureText("FACILE : [F]", 40) / 2, screenHeight / 2 + 20, 25, GRAY);
+	DrawText("INTERMEDIAIRE :   [I]", screenWidth / 2 - MeasureText("INTERMEDIAIRE : [I]", 40) / 2, screenHeight / 2 + 60, 25, GRAY);
+	DrawText("DIFFICILE :    [D]", screenWidth / 2 - MeasureText("DIFFICILE :[D]", 40) / 2, screenHeight / 2 + 100, 25, GRAY);
+	DrawText("PERSONNALISER : [P]", screenWidth / 2 - MeasureText("PERSONNALISE: [P]", 40) / 2, screenHeight / 2 + 140, 25, GRAY);
 
 	if (IsKeyPressed(KEY_F)) {
 		InitGame();
-		SetTargetFPS(45);
+		fps = 45;
+		SetTargetFPS(fps);
 		avecObstacle = false;
 		avecTraverser = true;
 		start = false;
-		gameOver = false;
 	}
 	if (IsKeyPressed(KEY_I)) {
 		InitGame();
-		SetTargetFPS(45);
+		fps = 45;
+		SetTargetFPS(fps);
 		avecObstacle = true;
 		avecTraverser = true;
 		start = false;
-		gameOver = false;
-
 	}
 	if (IsKeyPressed(KEY_D)) {
 		InitGame();
-		SetTargetFPS(60);
+		fps = 60;
+		SetTargetFPS(fps);
 		avecObstacle = true;
 		avecTraverser = false;
 		start = false;
-		gameOver = false;
-
 	}
 	if (IsKeyPressed(KEY_P)) {
-		parametres();
-
+		personnalise = true;
+		start = false;
 	}
-
-
-
-
-
 }
 
 //------------------------------------------------------------------------------------
@@ -257,10 +303,7 @@ int main(void)
 	//---------------------------------------------------------
 	InitWindow(screenWidth, screenHeight, "Snake");
 
-	avecTraverser = true;
-	avecObstacle = true;
 	start = true;
-	InitGame();
 
 
 
@@ -336,7 +379,7 @@ void InitGame(void)
 // Update game (one frame)
 void UpdateGame(void)
 {
-	if (!gameOver)
+	if (!gameOver && !start && !personnalise) // en cours de partie
 	{
 		if (IsKeyPressed('P')) pause = !pause;
 
@@ -387,6 +430,7 @@ void UpdateGame(void)
 				(snake[0].position.x < 0) || (snake[0].position.y < 0)))
 			{
 				gameOver = true;
+				modifierFichierScore;
 			}
 			// Collision contre mur avec traverserMur
 			if (((snake[0].position.x) > (gameScreenWidth - offset.x)) ||
@@ -440,33 +484,39 @@ void UpdateGame(void)
 			{
 				gameOver = true;
 				modifierFichierScore();
-				score = 0;
 			}
 			if (IsKeyPressed(KEY_ENTER)) {
 				gameOver = true;
 				modifierFichierScore();
-				score = 0;
 				start = true;
+			}
+			if (IsKeyPressed(KEY_SPACE)) {
+				SetTargetFPS(80);
 			}
 
 			framesCounter++;
 		}
 	}
-	else
-	{
-		if (IsKeyPressed(KEY_R))
-		{
-			InitGame();
-			gameOver = false;
-			score = 0;
-		}
-		if (IsKeyPressed(KEY_M))
-		{
-			start = true;
-			score = 0;
-		}
+	else if (gameOver && !start && !personnalise) { // en fin de partie
 
+	if (IsKeyPressed(KEY_R))
+	{
+		modifierFichierScore();
+		InitGame();
+		gameOver = false;
+		start = false;
+		personnalise = false;
 	}
+	if (IsKeyPressed(KEY_SEMICOLON)) // Equivalent de la touche [M] en AZERTY
+	{
+		start = true;
+		personnalise = false;
+		gameOver = true;
+	}
+
+}
+
+
 }
 
 // Draw game (one frame)
@@ -476,7 +526,7 @@ void DrawGame(void)
 
 	ClearBackground(RAYWHITE);
 
-	if (!gameOver && !start)
+	if (!gameOver && !start) // Pendant la partie
 	{
 
 		// Draw grid lines
@@ -499,16 +549,23 @@ void DrawGame(void)
 		// Draw side score
 		DrawText("SCORE", screenWidth - 100 - MeasureText("SCORE", 25) / 2, 25, 25, BLUE);
 
-		const char* scoreAffiche=(const char*)malloc(sizeof(int));
-		Convert(score, scoreAffiche);
+		const char* scoreAffiche = (const char*)malloc(sizeof(int));
+		convert(score, scoreAffiche);
 		DrawText(scoreAffiche, screenWidth - 100 - MeasureText(scoreAffiche, 25) / 2, 50, 25, BLUE);
 		free(scoreAffiche);
 
 		//Draw best score
 		DrawText("BEST SCORE", screenWidth - 100 - MeasureText("BEST SCORE", 25) / 2, 100, 25, RED);
 
+		//Draw commands
+		DrawText("[P] for pause", screenWidth - 100 - MeasureText("[P] for pause", 20) / 2, screenHeight - 75, 20, GRAY);
+		DrawText("[M] for the menu", screenWidth - 100 - MeasureText("[M] for the menu", 20) / 2,screenHeight - 50, 20, GRAY);
+		
+
+
+
 		const char* bestScoreAffiche = (const char*)malloc(sizeof(int));
-		Convert(bestScore, bestScoreAffiche);
+		convert(bestScore, bestScoreAffiche);
 		DrawText(bestScoreAffiche, screenWidth - 100 - MeasureText(bestScoreAffiche, 25) / 2, 125, 25, RED);
 		free(bestScoreAffiche);
 
@@ -524,7 +581,8 @@ void DrawGame(void)
 
 	}
 
-	else if (start) menuPrincipal();
+	else if (start && gameOver && !personnalise) menuPrincipal(); // Menu principal
+	else if (personnalise && gameOver && !start) personnaliser(); // Menu parametres
 	else {
 		DrawText("Rejouer : [R]", GetScreenWidth() / 2 - MeasureText("Rejouer : [R]", 20) / 2, GetScreenHeight() / 2 - 50, 20, GRAY);
 		DrawText("Menu Principal : [M]", GetScreenWidth() / 2 - MeasureText("Menu Principal : [M]", 20) / 2, GetScreenHeight() / 2 + 50, 20, GRAY);
