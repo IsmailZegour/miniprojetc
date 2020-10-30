@@ -54,11 +54,11 @@ typedef struct Obstacle {
 //------------------------------------------------------------------------------------
 // Global Variables Declaration
 //------------------------------------------------------------------------------------
-static const int screenWidth = 800;
+static const int gameScreenWidth = 800;
+
 static const int screenHeight = 450;
 
-static const int screenWidthtest = 1000;
-
+static const int screenWidth = 1000;
 
 
 static int framesCounter = 0;
@@ -77,6 +77,9 @@ static Vector2 snakePosition[SNAKE_LENGTH] = { 0 };
 static bool allowMove = false;
 static Vector2 offset = { 0 };
 static int counterTail = 0;
+static int score = 0;
+
+
 
 //------------------------------------------------------------------------------------
 // Module Functions Declaration (local)
@@ -90,13 +93,41 @@ static void UpdateDrawFrame(void);  // Update and Draw (one frame)
 //------------------------------------------------------------------------------------
 // Nouvelles fonction implémentées
 //------------------------------------------------------------------------------------
+void Convert(int Nb, char* NombreaEcrire)
+{
+	int Puissance, chiffre, i;
+	bool HasWriteNumber;
+	Puissance = 100000;
+	i = 0;
+	HasWriteNumber = false;
+
+	while (Puissance != 0)
+	{
+		chiffre = Nb / Puissance;
+		Nb = Nb - Puissance * chiffre;
+		if ((chiffre != 0) || (HasWriteNumber == true))
+		{
+			NombreaEcrire[i] = chiffre + 48;
+			i++;
+			HasWriteNumber = true;
+		}
+		Puissance = Puissance / 10;
+	}
+	if ((i == 0) && (HasWriteNumber == false))
+	{
+		NombreaEcrire[i] = 48;
+		i++;
+	}
+	NombreaEcrire[i] = '\0';
+
+}
 void traverserMur()
 {
-	if (((snake[0].position.x) > (screenWidth - offset.x)))
+	if (((snake[0].position.x) > (gameScreenWidth - offset.x)))
 		snake[0].position.x = offset.x / 2;
 
 	else if (((snake[0].position.x) < offset.x / 2))
-		snake[0].position.x = (screenWidth - offset.x / 2 - SQUARE_SIZE);
+		snake[0].position.x = (gameScreenWidth - offset.x / 2 - SQUARE_SIZE);
 
 	else if (((snake[0].position.y) > (screenHeight - offset.y)))
 		snake[0].position.y = offset.y / 2;
@@ -107,7 +138,7 @@ void traverserMur()
 void creerObstacle()
 {
 	obstacle.active = true;
-	obstacle.position = (Vector2){ GetRandomValue(0, (screenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2,
+	obstacle.position = (Vector2){ GetRandomValue(0, (gameScreenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2,
 		GetRandomValue(0, (screenHeight / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.y / 2 }; // On genere une position aléatoire pour l'obstacle
 
 	for (int i = 0; i < counterTail; i++)
@@ -115,7 +146,7 @@ void creerObstacle()
 		while (((obstacle.position.x == snake[i].position.x) && (obstacle.position.y == snake[i].position.y)) ||
 			((obstacle.position.x == fruit.position.x) && (obstacle.position.y == fruit.position.y))) // On vérifie qu'il ne tombe pas sur un fruit ou sur le serpent
 		{
-			obstacle.position = (Vector2){ GetRandomValue(0, (screenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2,
+			obstacle.position = (Vector2){ GetRandomValue(0, (gameScreenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2,
 				GetRandomValue(0, (screenHeight / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.y / 2 };
 			i = 0;
 		}
@@ -127,31 +158,56 @@ void collisionFruit()
 	counterTail += 1;
 	fruit.active = false;
 	obstacle.active = false;
+	score += 1;
 }
+void parametres() {
 
-void menuPrincipal()
-{
-	start = true;
 	BeginDrawing();
 
 	ClearBackground(RAYWHITE);
 
-	DrawText("SNAKE", screenWidth / 2 - MeasureText("SNAKE", 40) / 2 - 100, 100, 40, RED);
-	DrawText("FACILE", screenWidth / 2 - MeasureText("FACILE", 40) / 2, screenHeight / 2 + 20, 25, GRAY);
-	DrawText("INTERMEDIAIRE", screenWidth / 2 - MeasureText("INTERMEDIAIRE", 40) / 2, screenHeight / 2 + 60, 25, GRAY);
-	DrawText("DIFFICILE", screenWidth / 2 - MeasureText("DIFFICILE", 40) / 2, screenHeight / 2 + 100, 25, GRAY);
-	DrawText("PERSONNALISE", screenWidth / 2 - MeasureText("PERSONNALISE", 40) / 2, screenHeight / 2 + 140, 25, GRAY);
+}
+
+void menuPrincipal()
+{
+	BeginDrawing();
+
+	ClearBackground(RAYWHITE);
+
+	DrawText("SNAKE", screenWidth / 2 - MeasureText("SNAKE", 40) / 2 - 50, 100, 40, RED);
+	DrawText("FACILE : [F]", screenWidth / 2 - MeasureText("FACILE : [F]", 40) / 2, screenHeight / 2 + 20, 25, GRAY);
+	DrawText("INTERMEDIAIRE : [I]", screenWidth / 2 - MeasureText("INTERMEDIAIRE : [I]", 40) / 2, screenHeight / 2 + 60, 25, GRAY);
+	DrawText("DIFFICILE :[D]", screenWidth / 2 - MeasureText("DIFFICILE :[D]", 40) / 2, screenHeight / 2 + 100, 25, GRAY);
+	DrawText("PERSONNALISE: [P]", screenWidth / 2 - MeasureText("PERSONNALISE: [P]", 40) / 2, screenHeight / 2 + 140, 25, GRAY);
 
 	if (IsKeyPressed(KEY_F)) {
-
+		InitGame();
+		SetTargetFPS(45);
+		avecObstacle = false;
+		avecTraverser = true;
+		start = false;
+		gameOver = false;
 	}
 	if (IsKeyPressed(KEY_I)) {
+		InitGame();
+		SetTargetFPS(45);
+		avecObstacle = true;
+		avecTraverser = true;
+		start = false;
+		gameOver = false;
 
 	}
 	if (IsKeyPressed(KEY_D)) {
+		InitGame();
+		SetTargetFPS(60);
+		avecObstacle = true;
+		avecTraverser = false;
+		start = false;
+		gameOver = false;
 
 	}
 	if (IsKeyPressed(KEY_P)) {
+		parametres();
 
 	}
 
@@ -168,14 +224,13 @@ int main(void)
 {
 	// Initialization (Note windowTitle is unused on Android)
 	//---------------------------------------------------------
-	InitWindow(screenWidthtest, screenHeight, "Snake");
+	InitWindow(screenWidth, screenHeight, "Snake");
 
-	//MenuPrincipal();
 	avecTraverser = true;
 	avecObstacle = true;
 	start = true;
 	InitGame();
-	SetTargetFPS(50);
+
 
 
 #if defined(PLATFORM_WEB)
@@ -217,7 +272,7 @@ void InitGame(void)
 	counterTail = 1;
 	allowMove = false;
 
-	offset.x = screenWidth % SQUARE_SIZE;
+	offset.x = gameScreenWidth % SQUARE_SIZE;
 	offset.y = screenHeight % SQUARE_SIZE;
 
 	for (int i = 0; i < SNAKE_LENGTH; i++)
@@ -294,14 +349,14 @@ void UpdateGame(void)
 			}
 
 			// Collision contre mur sans traverserMur
-			if (!avecTraverser && (((snake[0].position.x) > (screenWidth - offset.x)) ||
+			if (!avecTraverser && (((snake[0].position.x) > (gameScreenWidth - offset.x)) ||
 				((snake[0].position.y) > (screenHeight - offset.y)) ||
 				(snake[0].position.x < 0) || (snake[0].position.y < 0)))
 			{
 				gameOver = true;
 			}
 			// Collision contre mur avec traverserMur
-			if (((snake[0].position.x) > (screenWidth - offset.x)) ||
+			if (((snake[0].position.x) > (gameScreenWidth - offset.x)) ||
 				((snake[0].position.y) > (screenHeight - offset.y)) ||
 				(snake[0].position.x < 0) || (snake[0].position.y < 0) && avecTraverser)
 			{
@@ -320,13 +375,13 @@ void UpdateGame(void)
 			if (!fruit.active)
 			{
 				fruit.active = true;
-				fruit.position = (Vector2){ GetRandomValue(0, (screenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2, GetRandomValue(0, (screenHeight / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.y / 2 };
+				fruit.position = (Vector2){ GetRandomValue(0, (gameScreenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2, GetRandomValue(0, (screenHeight / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.y / 2 };
 
 				for (int i = 0; i < counterTail; i++)
 				{
 					while ((fruit.position.x == snake[i].position.x) && (fruit.position.y == snake[i].position.y))
 					{
-						fruit.position = (Vector2){ GetRandomValue(0, (screenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2, GetRandomValue(0, (screenHeight / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.y / 2 };
+						fruit.position = (Vector2){ GetRandomValue(0, (gameScreenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2, GetRandomValue(0, (screenHeight / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.y / 2 };
 						i = 0;
 					}
 				}
@@ -347,12 +402,17 @@ void UpdateGame(void)
 			}
 
 			//Collision avec obstacle
-			if ((snake[0].position.x < (obstacle.position.x + obstacle.size.x) && (snake[0].position.x + snake[0].size.x) > obstacle.position.x) &&
+			if (avecObstacle && (snake[0].position.x < (obstacle.position.x + obstacle.size.x) && (snake[0].position.x + snake[0].size.x) > obstacle.position.x) &&
 				(snake[0].position.y < (obstacle.position.y + obstacle.size.y) && (snake[0].position.y + snake[0].size.y) > obstacle.position.y))
 			{
 				gameOver = true;
+				score = 0;
 			}
-
+			if (IsKeyPressed(KEY_ENTER)) {
+				gameOver = true;
+				score = 0;
+				start = true;
+			}
 
 			framesCounter++;
 		}
@@ -363,10 +423,12 @@ void UpdateGame(void)
 		{
 			InitGame();
 			gameOver = false;
+			score = 0;
 		}
 		if (IsKeyPressed(KEY_M))
 		{
-			menuPrincipal();
+			start = true;
+			score = 0;
 		}
 
 	}
@@ -383,14 +445,14 @@ void DrawGame(void)
 	{
 
 		// Draw grid lines
-		for (int i = 0; i < screenWidth / SQUARE_SIZE + 1; i++)
+		for (int i = 0; i < gameScreenWidth / SQUARE_SIZE + 1; i++)
 		{
 			DrawLineV((Vector2) { SQUARE_SIZE* i + offset.x / 2, offset.y / 2 }, (Vector2) { SQUARE_SIZE* i + offset.x / 2, screenHeight - offset.y / 2 }, LIGHTGRAY);
 		}
 
 		for (int i = 0; i < screenHeight / SQUARE_SIZE + 1; i++)
 		{
-			DrawLineV((Vector2) { offset.x / 2, SQUARE_SIZE* i + offset.y / 2 }, (Vector2) { screenWidth - offset.x / 2, SQUARE_SIZE* i + offset.y / 2 }, LIGHTGRAY);
+			DrawLineV((Vector2) { offset.x / 2, SQUARE_SIZE* i + offset.y / 2 }, (Vector2) { gameScreenWidth - offset.x / 2, SQUARE_SIZE* i + offset.y / 2 }, LIGHTGRAY);
 		}
 
 		// Draw snake
@@ -399,10 +461,22 @@ void DrawGame(void)
 		// Draw fruit to pick
 		DrawRectangleV(fruit.position, fruit.size, fruit.color);
 
+		// Draw side score
+		DrawText("SCORE", screenWidth - 100 - MeasureText("SCORE", 25) / 2, 25, 25, BLUE);
+
+		const char* scoreAffiche=(const char*)malloc(sizeof(int));
+		Convert(score, scoreAffiche);
+		DrawText(scoreAffiche, screenWidth - 100, 50, 25, BLUE);
+
 		// Draw Obstacle
 		if (avecObstacle) DrawRectangleV(obstacle.position, obstacle.size, obstacle.color);
 
-		if (pause) DrawText("GAME PAUSED", screenWidth / 2 - MeasureText("GAME PAUSED", 40) / 2, screenHeight / 2 - 40, 40, GRAY);
+
+
+
+		if (pause) DrawText("GAME PAUSED", gameScreenWidth / 2 - MeasureText("GAME PAUSED", 40) / 2, screenHeight / 2 - 40, 40, GRAY);
+
+
 
 	}
 
