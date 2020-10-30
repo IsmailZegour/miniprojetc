@@ -78,6 +78,8 @@ static bool allowMove = false;
 static Vector2 offset = { 0 };
 static int counterTail = 0;
 static int score = 0;
+static int bestScore = 0;
+
 
 
 
@@ -93,7 +95,7 @@ static void UpdateDrawFrame(void);  // Update and Draw (one frame)
 //------------------------------------------------------------------------------------
 // Nouvelles fonction implémentées
 //------------------------------------------------------------------------------------
-void Convert(int Nb, char* NombreaEcrire)
+void Convert(int Nb, char* NombreaEcrire)// Converti un int en char* pour l'affichage
 {
 	int Puissance, chiffre, i;
 	bool HasWriteNumber;
@@ -159,6 +161,7 @@ void collisionFruit()
 	fruit.active = false;
 	obstacle.active = false;
 	score += 1;
+	if (score >= bestScore) bestScore = score;
 }
 void parametres() {
 
@@ -167,12 +170,40 @@ void parametres() {
 	ClearBackground(RAYWHITE);
 
 }
+void lireFichierScore()
+{
+	char* nomFichier = "C:/Users/ismai/Desktop/DossierIsmail/CoursM1/MLOD/LangageC/miniprojet/Snake/score.txt";
+	FILE* fichier;
+	fichier = fopen(nomFichier, "r");
+	if (fichier == NULL)
+	{
+		printf("Error opening file %s : %d (%s)\n", nomFichier, errno, strerror(errno));
+		exit(1);
+	}
+	fscanf(fichier, "%u\n", &bestScore);
+	fclose(fichier);
 
+}
+void modifierFichierScore() {
+	char* nomFichier = "C:/Users/ismai/Desktop/DossierIsmail/CoursM1/MLOD/LangageC/miniprojet/Snake/score.txt";
+	FILE* fichier;
+	fichier = fopen(nomFichier, "r+");
+	fscanf(fichier, "%u\n", &bestScore);
+	if (score > bestScore) {
+		const char* scoreChar = (const char*)malloc(sizeof(int));
+		Convert(score, scoreChar);
+		fseek(fichier, SEEK_SET, 0);
+		fputs(scoreChar, fichier);
+		free(scoreChar);
+	}
+	fclose(fichier);
+
+}
 void menuPrincipal()
 {
 	BeginDrawing();
 
-	ClearBackground(RAYWHITE);
+	ClearBackground(SKYBLUE);
 
 	DrawText("SNAKE", screenWidth / 2 - MeasureText("SNAKE", 40) / 2 - 50, 100, 40, RED);
 	DrawText("FACILE : [F]", screenWidth / 2 - MeasureText("FACILE : [F]", 40) / 2, screenHeight / 2 + 20, 25, GRAY);
@@ -298,6 +329,8 @@ void InitGame(void)
 	obstacle.color = RED;
 	obstacle.active = false;
 
+	lireFichierScore();
+
 }
 
 // Update game (one frame)
@@ -406,10 +439,12 @@ void UpdateGame(void)
 				(snake[0].position.y < (obstacle.position.y + obstacle.size.y) && (snake[0].position.y + snake[0].size.y) > obstacle.position.y))
 			{
 				gameOver = true;
+				modifierFichierScore();
 				score = 0;
 			}
 			if (IsKeyPressed(KEY_ENTER)) {
 				gameOver = true;
+				modifierFichierScore();
 				score = 0;
 				start = true;
 			}
@@ -466,7 +501,16 @@ void DrawGame(void)
 
 		const char* scoreAffiche=(const char*)malloc(sizeof(int));
 		Convert(score, scoreAffiche);
-		DrawText(scoreAffiche, screenWidth - 100, 50, 25, BLUE);
+		DrawText(scoreAffiche, screenWidth - 100 - MeasureText(scoreAffiche, 25) / 2, 50, 25, BLUE);
+		free(scoreAffiche);
+
+		//Draw best score
+		DrawText("BEST SCORE", screenWidth - 100 - MeasureText("BEST SCORE", 25) / 2, 100, 25, RED);
+
+		const char* bestScoreAffiche = (const char*)malloc(sizeof(int));
+		Convert(bestScore, bestScoreAffiche);
+		DrawText(bestScoreAffiche, screenWidth - 100 - MeasureText(bestScoreAffiche, 25) / 2, 125, 25, RED);
+		free(bestScoreAffiche);
 
 		// Draw Obstacle
 		if (avecObstacle) DrawRectangleV(obstacle.position, obstacle.size, obstacle.color);
