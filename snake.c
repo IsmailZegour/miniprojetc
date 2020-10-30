@@ -175,28 +175,28 @@ void personnaliser() {
 	//Affichage obstacle
 	DrawText("Obstacles : ", screenWidth / 4 - MeasureText("SNAKE", 40) / 2 - 50, 150, 30, BLACK);
 	DrawText("[O]", screenWidth / 2 + 150, 150, 30, BLACK);
-	if(avecObstacle) 	DrawText("Oui ", screenWidth / 2, 150, 30, GREEN);
-	else DrawText("Non", screenWidth / 2 , 150, 30, RED);
+	if (avecObstacle) 	DrawText("Oui ", screenWidth / 2, 150, 30, GREEN);
+	else DrawText("Non", screenWidth / 2, 150, 30, RED);
 
 	//Affichage traverser les murs
 	DrawText("Traverser les murs : ", screenWidth / 4 - MeasureText("SNAKE", 40) / 2 - 50, 200, 30, BLACK);
 	DrawText("[T]", screenWidth / 2 + 150, 200, 30, BLACK);
 	if (avecTraverser) 	DrawText("Oui ", screenWidth / 2, 200, 30, GREEN);
-	else DrawText("Non", screenWidth / 2 , 200, 30, RED);
+	else DrawText("Non", screenWidth / 2, 200, 30, RED);
 
 	//Affichage vitesse
 	DrawText("Vitesse : ", screenWidth / 4 - MeasureText("SNAKE", 40) / 2 - 50, 250, 30, BLACK);
 
 	const char* fpss = malloc(sizeof(int));
 	convert(fps, fpss);
-	if(fps<30) DrawText(fpss, screenWidth / 2, 250, 30, BLUE);
-	else if(fps>=30 && fps <=60) DrawText(fpss, screenWidth / 2, 250, 30, GREEN);
-	else if(fps>60) DrawText(fpss, screenWidth / 2, 250, 30, RED);
+	if (fps < 30) DrawText(fpss, screenWidth / 2, 250, 30, BLUE);
+	else if (fps >= 30 && fps <= 60) DrawText(fpss, screenWidth / 2, 250, 30, GREEN);
+	else if (fps > 60) DrawText(fpss, screenWidth / 2, 250, 30, RED);
 	free(fpss);
 
 	//Affichage touches
-	DrawText("[M] pour le Menu", screenWidth / 8, screenHeight-50, 20, GRAY);
-	DrawText("[ENTREE] pour lancer", screenWidth - MeasureText("[ENTREE] pour lancer", 20)- 125, screenHeight - 50, 20, GRAY);
+	DrawText("[M] pour le Menu", screenWidth / 8, screenHeight - 50, 20, GRAY);
+	DrawText("[ENTREE] pour lancer", screenWidth - MeasureText("[ENTREE] pour lancer", 20) - 125, screenHeight - 50, 20, GRAY);
 
 	if (IsKeyPressed('O')) avecObstacle = !avecObstacle;
 	else if (IsKeyPressed('T')) avecTraverser = !avecTraverser;
@@ -213,7 +213,7 @@ void personnaliser() {
 	}
 
 
-	else if (IsKeyPressed(KEY_ENTER) && fps > 0 )
+	else if (IsKeyPressed(KEY_ENTER) && fps > 0)
 	{
 		InitGame();
 		SetTargetFPS(fps);
@@ -259,10 +259,10 @@ void menuPrincipal()
 	ClearBackground(SKYBLUE);
 
 	DrawText("SNAKE", screenWidth / 2 - MeasureText("SNAKE", 40) / 2 - 50, 100, 40, RED);
-	DrawText("FACILE :      [F]", screenWidth / 2 - MeasureText("FACILE : [F]", 40) / 2, screenHeight / 2 + 20, 25, GRAY);
-	DrawText("INTERMEDIAIRE :   [I]", screenWidth / 2 - MeasureText("INTERMEDIAIRE : [I]", 40) / 2, screenHeight / 2 + 60, 25, GRAY);
-	DrawText("DIFFICILE :    [D]", screenWidth / 2 - MeasureText("DIFFICILE :[D]", 40) / 2, screenHeight / 2 + 100, 25, GRAY);
-	DrawText("PERSONNALISER : [P]", screenWidth / 2 - MeasureText("PERSONNALISE: [P]", 40) / 2, screenHeight / 2 + 140, 25, GRAY);
+	DrawText("FACILE :      [F]", screenWidth / 2 - MeasureText("FACILE : [F]", 40) / 2, screenHeight / 2 + 20, 25, BLACK);
+	DrawText("INTERMEDIAIRE :   [I]", screenWidth / 2 - MeasureText("INTERMEDIAIRE : [I]", 40) / 2, screenHeight / 2 + 60, 25, BLACK);
+	DrawText("DIFFICILE :    [D]", screenWidth / 2 - MeasureText("DIFFICILE :[D]", 40) / 2, screenHeight / 2 + 100, 25, BLACK);
+	DrawText("PERSONNALISER : [P]", screenWidth / 2 - MeasureText("PERSONNALISE: [P]", 40) / 2, screenHeight / 2 + 140, 25, BLACK);
 
 	if (IsKeyPressed(KEY_F)) {
 		InitGame();
@@ -485,13 +485,22 @@ void UpdateGame(void)
 				gameOver = true;
 				modifierFichierScore();
 			}
-			if (IsKeyPressed(KEY_ENTER)) {
+			if (IsKeyPressed(KEY_SEMICOLON))// Equivalent de la touche [M] en AZERTY
+			{
 				gameOver = true;
 				modifierFichierScore();
 				start = true;
 			}
-			if (IsKeyPressed(KEY_SPACE)) {
-				SetTargetFPS(80);
+			if (IsKeyPressed(KEY_W)) 
+			{
+
+				if(fps<120)fps += 5;
+				SetTargetFPS(fps);
+			}
+			if (IsKeyPressed(KEY_Q))
+			{
+				if(fps>5)fps -= 5;
+				SetTargetFPS(fps);
 			}
 
 			framesCounter++;
@@ -499,22 +508,22 @@ void UpdateGame(void)
 	}
 	else if (gameOver && !start && !personnalise) { // en fin de partie
 
-	if (IsKeyPressed(KEY_R))
-	{
-		modifierFichierScore();
-		InitGame();
-		gameOver = false;
-		start = false;
-		personnalise = false;
-	}
-	if (IsKeyPressed(KEY_SEMICOLON)) // Equivalent de la touche [M] en AZERTY
-	{
-		start = true;
-		personnalise = false;
-		gameOver = true;
-	}
+		if (IsKeyPressed(KEY_R))
+		{
+			modifierFichierScore();
+			InitGame();
+			gameOver = false;
+			start = false;
+			personnalise = false;
+		}
+		if (IsKeyPressed(KEY_SEMICOLON)) // Equivalent de la touche [M] en AZERTY
+		{
+			start = true;
+			personnalise = false;
+			gameOver = true;
+		}
 
-}
+	}
 
 
 }
@@ -548,7 +557,6 @@ void DrawGame(void)
 
 		// Draw side score
 		DrawText("SCORE", screenWidth - 100 - MeasureText("SCORE", 25) / 2, 25, 25, BLUE);
-
 		const char* scoreAffiche = (const char*)malloc(sizeof(int));
 		convert(score, scoreAffiche);
 		DrawText(scoreAffiche, screenWidth - 100 - MeasureText(scoreAffiche, 25) / 2, 50, 25, BLUE);
@@ -559,25 +567,24 @@ void DrawGame(void)
 
 		//Draw commands
 		DrawText("[P] for pause", screenWidth - 100 - MeasureText("[P] for pause", 20) / 2, screenHeight - 75, 20, GRAY);
-		DrawText("[M] for the menu", screenWidth - 100 - MeasureText("[M] for the menu", 20) / 2,screenHeight - 50, 20, GRAY);
-		
-
-
+		DrawText("[M] for the menu", screenWidth - 100 - MeasureText("[M] for the menu", 20) / 2, screenHeight - 50, 20, GRAY);
 
 		const char* bestScoreAffiche = (const char*)malloc(sizeof(int));
 		convert(bestScore, bestScoreAffiche);
 		DrawText(bestScoreAffiche, screenWidth - 100 - MeasureText(bestScoreAffiche, 25) / 2, 125, 25, RED);
 		free(bestScoreAffiche);
 
+		//Draw FPS
+		DrawText("[A]- FPS +[Z]", screenWidth - 100 - MeasureText("[A]- FPS +[Z]", 20) / 2, 200, 20, BLACK);
+		const char* fpss = malloc(sizeof(int));
+		convert(fps, fpss);
+		DrawText(fpss, screenWidth - 100 - MeasureText(fpss, 20) / 2, 220, 20, BLACK);
+		
+
 		// Draw Obstacle
 		if (avecObstacle) DrawRectangleV(obstacle.position, obstacle.size, obstacle.color);
 
-
-
-
 		if (pause) DrawText("GAME PAUSED", gameScreenWidth / 2 - MeasureText("GAME PAUSED", 40) / 2, screenHeight / 2 - 40, 40, GRAY);
-
-
 
 	}
 
