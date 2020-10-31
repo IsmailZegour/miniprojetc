@@ -64,6 +64,7 @@ static bool gameOver = true;
 static bool pause = false;
 static bool start = true;
 static bool personnalise = false;
+static bool automatique = false;
 
 static bool avecTraverser = false;
 static bool avecObstacle = false;
@@ -184,6 +185,8 @@ void personnaliser() {
 
 	//Affichage vitesse
 	DrawText("Vitesse : ", screenWidth / 4 - MeasureText("SNAKE", 40) / 2 - 50, 250, 30, BLACK);
+	DrawText("[<]", screenWidth / 2 - 50, 250, 30, BLACK);
+	DrawText("[>]", screenWidth / 2 + 50, 250, 30, BLACK);
 
 	const char* fpss = malloc(sizeof(int));
 	convert(fps, fpss);
@@ -255,12 +258,21 @@ void modifierFichierScore() {
 void menuPrincipal()
 {
 	ClearBackground(SKYBLUE);
-
-	DrawText("SNAKE", screenWidth / 2 - MeasureText("SNAKE", 40) / 2 - 50, 100, 40, RED);
-	DrawText("FACILE :      [F]", screenWidth / 2 - MeasureText("FACILE : [F]", 40) / 2, screenHeight / 2 + 20, 25, BLACK);
-	DrawText("INTERMEDIAIRE :   [I]", screenWidth / 2 - MeasureText("INTERMEDIAIRE : [I]", 40) / 2, screenHeight / 2 + 60, 25, BLACK);
-	DrawText("DIFFICILE :    [D]", screenWidth / 2 - MeasureText("DIFFICILE :[D]", 40) / 2, screenHeight / 2 + 100, 25, BLACK);
-	DrawText("PERSONNALISER : [P]", screenWidth / 2 - MeasureText("PERSONNALISE: [P]", 40) / 2, screenHeight / 2 + 140, 25, BLACK);
+	DrawText("ISMAIL ZEGOUR", 50, 10, 20, GRAY);
+	DrawText("RAYLIB", screenWidth-150, 10, 20, GRAY);
+	DrawText("SNAKE 2.0", screenWidth / 2 - MeasureText("SNAKE 2.0", 40) / 2 , 100, 40, BLACK);
+	DrawText("FACILE :      [F]", screenWidth / 2 - MeasureText("FACILE : [F]", 25) / 2, screenHeight / 2 -20, 25, BLACK);
+	DrawText("INTERMEDIAIRE :   [I]", screenWidth / 2 - MeasureText("INTERMEDIAIRE : [I]", 25) / 2, screenHeight / 2 + 20, 25, BLACK);
+	DrawText("DIFFICILE :    [D]", screenWidth / 2 - MeasureText("DIFFICILE :[D]", 25) / 2, screenHeight / 2 + 60, 25, BLACK);
+	DrawText("PERSONNALISER : [P]", screenWidth / 2 - MeasureText("PERSONNALISE: [P]", 25) / 2, screenHeight / 2 + 100, 25, BLACK);
+	DrawText("MODE AUTOMATIQUE :[A]", screenWidth /2 - MeasureText("MODE AUTOMATIQUE :[A]", 30) / 2, screenHeight / 2 + 140, 30, BLACK);
+	DrawText("BEST SCORE", screenWidth - 140 - MeasureText("BEST SCORE", 25) / 2, 200, 25, RED);
+	DrawText("Can you beat that ?", screenWidth - 140 - MeasureText("Can you beat that ?", 20) / 2, 280, 20, BLACK);
+	lireFichierScore();
+	const char* bestScoreAffiche = (const char*)malloc(sizeof(int));
+	convert(bestScore, bestScoreAffiche);
+	DrawText(bestScoreAffiche, screenWidth - 140 - MeasureText(bestScoreAffiche, 25) / 2, 225, 25, RED);
+	free(bestScoreAffiche);
 
 	if (IsKeyPressed(KEY_F)) {
 		InitGame();
@@ -288,6 +300,15 @@ void menuPrincipal()
 	}
 	if (IsKeyPressed(KEY_P)) {
 		personnalise = true;
+		start = false;
+	}
+	if (IsKeyPressed(KEY_Q)) {
+		InitGame();
+		fps = 60;
+		SetTargetFPS(fps);
+		automatique = true;
+		avecObstacle = true;
+		avecTraverser = false;
 		start = false;
 	}
 }
@@ -322,19 +343,23 @@ void moveDown()
 }
 bool murHaut()
 {
-	return ((snake[0].position.y-SQUARE_SIZE) < offset.y / 2);
+	return ((snake[0].position.y-SQUARE_SIZE) < offset.y / 2)
+		|| (avecObstacle && snake[0].position.x == obstacle.position.x && snake[0].position.y - SQUARE_SIZE == obstacle.position.y);
 }
 bool murBas()
 {
-	return (snake[0].position.y+SQUARE_SIZE) > (screenHeight - offset.y);
+	return (snake[0].position.y+SQUARE_SIZE) > (screenHeight - offset.y)
+		|| (avecObstacle && snake[0].position.x  == obstacle.position.x && snake[0].position.y + SQUARE_SIZE == obstacle.position.y);
 }
 bool murDroit()
 {
-	return (snake[0].position.x + SQUARE_SIZE) > (gameScreenWidth - offset.x);
+	return (snake[0].position.x + SQUARE_SIZE) > (gameScreenWidth - offset.x) 
+		|| (avecObstacle && snake[0].position.x + SQUARE_SIZE == obstacle.position.x && snake[0].position.y == obstacle.position.y);
 }
 bool murGauche()
 {
-	return ((snake[0].position.x-SQUARE_SIZE) < offset.x / 2);
+	return ((snake[0].position.x-SQUARE_SIZE) < offset.x / 2) 
+		|| (avecObstacle && snake[0].position.x - SQUARE_SIZE == obstacle.position.x && snake[0].position.y == obstacle.position.y);
 }
 
 void mouvementAuto()
@@ -363,7 +388,7 @@ void mouvementAuto()
 			if (((snake[0].position.x == snake[i].position.x) && (snake[0].position.y - SQUARE_SIZE == snake[i].position.y))) // Si queue a droite
 				queueHaut = true;
 		}
-		if (queueDroite) //Si queue à droite
+		if (queueDroite || murDroit()) //Si queue ou obstacle à droite
 		{
 			if (snake[0].speed.y < 0)// si on montait
 			{
@@ -435,7 +460,7 @@ void mouvementAuto()
 			if (((snake[0].position.x == snake[i].position.x) && (snake[0].position.y - SQUARE_SIZE == snake[i].position.y))) // Si queue a droite
 				queueHaut = true;
 		}
-		if (queueGauche) //Si queue à gauche
+		if (queueGauche || murGauche()) //Si queue ou obstacle à gauche
 		{
 			if (snake[0].speed.y < 0)// si on montait
 			{
@@ -507,7 +532,7 @@ void mouvementAuto()
 			if (((snake[0].position.x == snake[i].position.x) && (snake[0].position.y - SQUARE_SIZE == snake[i].position.y))) // Si queue a droite
 				queueHaut = true;
 		}
-		if (queueBas) //Si queue en bas
+		if (queueBas || murBas()) //Si queue ou obstacle en bas
 		{
 			if (snake[0].speed.x < 0)// si on allait a gauche
 			{
@@ -581,7 +606,7 @@ void mouvementAuto()
 			if (((snake[0].position.x == snake[i].position.x) && (snake[0].position.y - SQUARE_SIZE == snake[i].position.y))) // Si queue a droite
 				queueHaut = true;
 		}
-		if (queueHaut) //Si queue en haut
+		if (queueHaut || murHaut()) //Si queue ou obstacle en haut
 		{
 			if (snake[0].speed.x < 0)// si on allait a gauche
 			{
@@ -633,7 +658,7 @@ void mouvementAuto()
 	
 
 }
-void snakeMouvement()
+void mouvementManuel()
 {
 	if (IsKeyPressed(KEY_RIGHT) && (snake[0].speed.x == 0))
 		moveRight();
@@ -656,10 +681,7 @@ int main(void)
 	// Initialization (Note windowTitle is unused on Android)
 	//---------------------------------------------------------
 	InitWindow(screenWidth, screenHeight, "Snake");
-
 	start = true;
-
-
 
 #if defined(PLATFORM_WEB)
 	emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
@@ -740,8 +762,8 @@ void UpdateGame(void)
 		if (!pause)
 		{
 			// Player control
-			snakeMouvement();
-			mouvementAuto();
+			mouvementManuel();
+			if (automatique) mouvementAuto();
 
 
 			// Snake movement
@@ -800,7 +822,6 @@ void UpdateGame(void)
 					}
 				}
 			}
-
 
 			// Collision avec fruit
 			if ((snake[0].position.x < (fruit.position.x + fruit.size.x) && (snake[0].position.x + snake[0].size.x) > fruit.position.x) &&
@@ -901,15 +922,15 @@ void DrawGame(void)
 
 		//Draw best score
 		DrawText("BEST SCORE", screenWidth - 100 - MeasureText("BEST SCORE", 25) / 2, 100, 25, RED);
+		const char* bestScoreAffiche = (const char*)malloc(sizeof(int));
+		convert(bestScore, bestScoreAffiche);
+		DrawText(bestScoreAffiche, screenWidth - 100 - MeasureText(bestScoreAffiche, 25) / 2, 125, 25, RED);
+		free(bestScoreAffiche);
 
 		//Draw commands
 		DrawText("[P] for pause", screenWidth - 100 - MeasureText("[P] for pause", 20) / 2, screenHeight - 75, 20, GRAY);
 		DrawText("[M] for the menu", screenWidth - 100 - MeasureText("[M] for the menu", 20) / 2, screenHeight - 50, 20, GRAY);
 
-		const char* bestScoreAffiche = (const char*)malloc(sizeof(int));
-		convert(bestScore, bestScoreAffiche);
-		DrawText(bestScoreAffiche, screenWidth - 100 - MeasureText(bestScoreAffiche, 25) / 2, 125, 25, RED);
-		free(bestScoreAffiche);
 
 		//Draw FPS
 		DrawText("[A]- VITESSE +[Z]", screenWidth - 100 - MeasureText("[A]- VITESSE +[Z]", 20) / 2, 200, 20, BLACK);
@@ -917,6 +938,11 @@ void DrawGame(void)
 		convert(fps, fpss);
 		DrawText(fpss, screenWidth - 100 - MeasureText(fpss, 20) / 2, 220, 20, BLACK);
 		free(fpss);
+
+		// Draw traverser
+		DrawText("Traverser les murs :", screenWidth - 100 - MeasureText("Traverser les murs :", 20) / 2, 300, 20, BLACK);
+		if (avecTraverser) DrawText("Oui", screenWidth - 100 - MeasureText("Oui", 20) / 2, 330, 20, GREEN);
+		if (!avecTraverser)DrawText("Non", screenWidth - 100 - MeasureText("Non", 20) / 2, 330, 20, RED);
 
 
 		// Draw Obstacle
