@@ -8,7 +8,7 @@
 *   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
 *
 *   Copyright (c) 2015 Ramon Santamaria (@raysan5)
-* 
+*
 *   Extension by Ismail Zegour - 31/10/2020
 *
 ********************************************************************************************/
@@ -51,6 +51,17 @@ typedef struct Obstacle {
 	Color color;
 } Obstacle;
 
+
+
+//------------------------------------------------------------------------------------
+// Module Functions Declaration (local)
+//------------------------------------------------------------------------------------
+static void InitGame(void);         // Initialize game
+static void UpdateGame(void);       // Update game (one frame)
+static void DrawGame(void);         // Draw game (one frame)
+static void UnloadGame(void);       // Unload game
+static void UpdateDrawFrame(void);  // Update and Draw (one frame)
+
 //------------------------------------------------------------------------------------
 // Global Variables Declaration
 //------------------------------------------------------------------------------------
@@ -81,19 +92,6 @@ static int counterTail = 0;
 static int score = 0;
 static int bestScore = 0;
 static int fps = 30;
-
-
-
-
-
-//------------------------------------------------------------------------------------
-// Module Functions Declaration (local)
-//------------------------------------------------------------------------------------
-static void InitGame(void);         // Initialize game
-static void UpdateGame(void);       // Update game (one frame)
-static void DrawGame(void);         // Draw game (one frame)
-static void UnloadGame(void);       // Unload game
-static void UpdateDrawFrame(void);  // Update and Draw (one frame)
 
 //------------------------------------------------------------------------------------
 // Nouvelles fonction implémentées
@@ -142,20 +140,25 @@ void traverserMur()
 }
 void creerObstacle()
 {
-	obstacle.active = true;
-	obstacle.position = (Vector2){ GetRandomValue(0, (gameScreenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2,
-		GetRandomValue(0, (screenHeight / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.y / 2 }; // On genere une position aléatoire pour l'obstacle
+	int i = GetRandomValue(0, 2);
+	if (!i) {
+		obstacle.active = true;
+		obstacle.position = (Vector2){ GetRandomValue(0, (gameScreenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2,
+			GetRandomValue(0, (screenHeight / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.y / 2 }; // On genere une position aléatoire pour l'obstacle
 
-	for (int i = 0; i < counterTail; i++)
-	{
-		while (((obstacle.position.x == snake[i].position.x) && (obstacle.position.y == snake[i].position.y)) ||
-			((obstacle.position.x == fruit.position.x) && (obstacle.position.y == fruit.position.y))) // On vérifie qu'il ne tombe pas sur un fruit ou sur le serpent
+		for (int i = 0; i < counterTail; i++)
 		{
-			obstacle.position = (Vector2){ GetRandomValue(0, (gameScreenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2,
-				GetRandomValue(0, (screenHeight / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.y / 2 };
-			i = 0;
+			while (((obstacle.position.x == snake[i].position.x) && (obstacle.position.y == snake[i].position.y)) ||
+				((obstacle.position.x == fruit.position.x) && (obstacle.position.y == fruit.position.y))) // On vérifie qu'il ne tombe pas sur un fruit ou sur le serpent
+			{
+				obstacle.position = (Vector2){ GetRandomValue(0, (gameScreenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2,
+					GetRandomValue(0, (screenHeight / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.y / 2 };
+				i = 0;
+			}
 		}
+
 	}
+
 }
 void collisionFruit()
 {
@@ -259,13 +262,13 @@ void menuPrincipal()
 {
 	ClearBackground(SKYBLUE);
 	DrawText("ISMAIL ZEGOUR", 50, 10, 20, GRAY);
-	DrawText("RAYLIB", screenWidth-150, 10, 20, GRAY);
-	DrawText("SNAKE 2.0", screenWidth / 2 - MeasureText("SNAKE 2.0", 40) / 2 , 100, 40, BLACK);
-	DrawText("FACILE :      [F]", screenWidth / 2 - MeasureText("FACILE : [F]", 25) / 2, screenHeight / 2 -20, 25, BLACK);
+	DrawText("RAYLIB", screenWidth - 150, 10, 20, GRAY);
+	DrawText("SNAKE 2.0", screenWidth / 2 - MeasureText("SNAKE 2.0", 40) / 2, 100, 40, BLACK);
+	DrawText("FACILE :      [F]", screenWidth / 2 - MeasureText("FACILE : [F]", 25) / 2, screenHeight / 2 - 20, 25, BLACK);
 	DrawText("INTERMEDIAIRE :   [I]", screenWidth / 2 - MeasureText("INTERMEDIAIRE : [I]", 25) / 2, screenHeight / 2 + 20, 25, BLACK);
 	DrawText("DIFFICILE :    [D]", screenWidth / 2 - MeasureText("DIFFICILE :[D]", 25) / 2, screenHeight / 2 + 60, 25, BLACK);
 	DrawText("PERSONNALISER : [P]", screenWidth / 2 - MeasureText("PERSONNALISE: [P]", 25) / 2, screenHeight / 2 + 100, 25, BLACK);
-	DrawText("MODE AUTOMATIQUE :[A]", screenWidth /2 - MeasureText("MODE AUTOMATIQUE :[A]", 30) / 2, screenHeight / 2 + 140, 30, BLACK);
+	DrawText("MODE AUTOMATIQUE :[A]", screenWidth / 2 - MeasureText("MODE AUTOMATIQUE :[A]", 30) / 2, screenHeight / 2 + 140, 30, BLACK);
 	DrawText("BEST SCORE", screenWidth - 140 - MeasureText("BEST SCORE", 25) / 2, 200, 25, RED);
 	DrawText("Can you beat that ?", screenWidth - 140 - MeasureText("Can you beat that ?", 20) / 2, 280, 20, BLACK);
 	lireFichierScore();
@@ -343,22 +346,22 @@ void moveDown()
 }
 bool murHaut()
 {
-	return ((snake[0].position.y-SQUARE_SIZE) < offset.y / 2)
+	return ((snake[0].position.y - SQUARE_SIZE) < offset.y / 2)
 		|| (avecObstacle && snake[0].position.x == obstacle.position.x && snake[0].position.y - SQUARE_SIZE == obstacle.position.y);
 }
 bool murBas()
 {
-	return (snake[0].position.y+SQUARE_SIZE) > (screenHeight - offset.y)
-		|| (avecObstacle && snake[0].position.x  == obstacle.position.x && snake[0].position.y + SQUARE_SIZE == obstacle.position.y);
+	return (snake[0].position.y + SQUARE_SIZE) > (screenHeight - offset.y)
+		|| (avecObstacle && snake[0].position.x == obstacle.position.x && snake[0].position.y + SQUARE_SIZE == obstacle.position.y);
 }
 bool murDroit()
 {
-	return (snake[0].position.x + SQUARE_SIZE) > (gameScreenWidth - offset.x) 
+	return (snake[0].position.x + SQUARE_SIZE) > (gameScreenWidth - offset.x)
 		|| (avecObstacle && snake[0].position.x + SQUARE_SIZE == obstacle.position.x && snake[0].position.y == obstacle.position.y);
 }
 bool murGauche()
 {
-	return ((snake[0].position.x-SQUARE_SIZE) < offset.x / 2) 
+	return ((snake[0].position.x - SQUARE_SIZE) < offset.x / 2)
 		|| (avecObstacle && snake[0].position.x - SQUARE_SIZE == obstacle.position.x && snake[0].position.y == obstacle.position.y);
 }
 
@@ -368,7 +371,7 @@ void mouvementAuto()
 	float depy = fruit.position.y - snake[0].position.y;
 
 	// Mouvement à droite
-	if (depx > 0 && allowMove) 
+	if (depx > 0 && allowMove)
 	{
 		bool queueDroite = false;
 		bool queueGauche = false;
@@ -376,7 +379,7 @@ void mouvementAuto()
 		bool queueHaut = false;
 		for (int i = 1; i < counterTail; i++)// On verifie s'il y a sa queue aux alentours
 		{
-			if (((snake[0].position.x + SQUARE_SIZE == snake[i].position.x)&& (snake[0].position.y == snake[i].position.y))) // Si queue a droite
+			if (((snake[0].position.x + SQUARE_SIZE == snake[i].position.x) && (snake[0].position.y == snake[i].position.y))) // Si queue a droite
 				queueDroite = true;
 
 			if (((snake[0].position.x - SQUARE_SIZE == snake[i].position.x) && (snake[0].position.y == snake[i].position.y))) // Si queue a gauche
@@ -396,7 +399,7 @@ void mouvementAuto()
 					moveLeft();
 				else
 					allowMove = false;
-			} 
+			}
 			if (snake[0].speed.y > 0)// si on descendait
 			{
 				if (queueBas || murBas())
@@ -404,8 +407,8 @@ void mouvementAuto()
 				else
 					allowMove = false;
 			}
-			//Prévision a n-10 pour éviter les culs de sac
-			if (snake[0].speed.x > 0 && depy == 0 && snake[0].position.y - snake[10].position.y > 0) // Si on allait a droite en venant du haut a n-4
+			//Prévision pour éviter les culs de sac
+			if (snake[0].speed.x > 0 && depy == 0 && snake[0].position.y - snake[counterTail / 2].position.y > 0) // Si on allait a droite en venant du haut a n-4
 			{
 				if (queueBas || murBas())
 					moveUp();
@@ -435,12 +438,12 @@ void mouvementAuto()
 			}
 
 		}
-		else 
+		else
 			moveRight();
 	}
 
 	// Mouvement à gauche
-	if (depx < 0 && allowMove) 
+	if (depx < 0 && allowMove)
 	{
 		bool queueDroite = false;
 		bool queueGauche = false;
@@ -471,13 +474,13 @@ void mouvementAuto()
 			}
 			if (snake[0].speed.y > 0)// si on descendait
 			{
-				if (queueBas|| murBas())
+				if (queueBas || murBas())
 					moveRight();
 				else
 					moveDown();
 			}
 
-			if (snake[0].speed.x < 0 && depy == 0 && snake[0].position.y -snake[10].position.y > 0) // Si on allait a gauche en venant du haut a n-10
+			if (snake[0].speed.x < 0 && depy == 0 && snake[0].position.y - snake[counterTail / 2].position.y > 0) // Si on allait a gauche en venant du haut 
 			{
 				if (queueBas || murBas())
 					moveUp();
@@ -507,12 +510,12 @@ void mouvementAuto()
 			}
 
 		}
-		else 
+		else
 			moveLeft();
 	}
 
 	// Mouvement en bas
-	if (depy > 0 && allowMove) 
+	if (depy > 0 && allowMove)
 	{
 		bool queueDroite = false;
 		bool queueGauche = false;
@@ -551,8 +554,8 @@ void mouvementAuto()
 
 
 
-			// Prevision n-10 ( pour éviter les culs de sac)
-			if (snake[0].speed.y > 0 && depx == 0 && snake[0].position.x - snake[10].position.x < 0)// Si on allait en bas et que l'on vient de la droite (verification etat n-10 arbitrairement)
+			// Prevision ( pour éviter les culs de sac)
+			if (snake[0].speed.y > 0 && depx == 0 && snake[0].position.x - snake[counterTail / 2].position.x < 0)// Si on allait en bas et que l'on vient de la droite (verification etat n-10 arbitrairement)
 			{
 				if (queueGauche || murGauche())
 					moveRight();
@@ -560,7 +563,7 @@ void mouvementAuto()
 					moveLeft();// Alors on va essayer de s'eloigner de nos précedentes positions en allant vers la gauche en priorité
 			}
 
-			if (snake[0].speed.y > 0 && depx == 0 )// Sinon on vient de la gauche ou d'en haut
+			if (snake[0].speed.y > 0 && depx == 0)// Sinon on vient de la gauche ou d'en haut
 			{
 				if (queueDroite || murDroit())
 					moveLeft();
@@ -622,8 +625,8 @@ void mouvementAuto()
 				else
 					allowMove = false;;
 			}
-			// Prevision n-10 ( pour éviter les culs de sac)
-			if (snake[0].speed.y < 0 && depx == 0 && snake[0].position.x - snake[10].position.x < 0)// Si on allait en haut et que l'on vient de la droite (verification etat n-10 arbitrairement)
+			// Prevision ( pour éviter les culs de sac)
+			if (snake[0].speed.y < 0 && depx == 0 && snake[0].position.x - snake[counterTail / 2].position.x < 0)// Si on allait en haut et que l'on vient de la droite (verification a la moitié arbitrairement)
 			{
 				if (queueGauche || murGauche())
 					moveRight();
@@ -631,7 +634,7 @@ void mouvementAuto()
 					moveLeft();// Alors on va essayer de s'eloigner de nos précedentes positions en allant vers la gauche en priorité
 			}
 
-			if (snake[0].speed.y < 0 && depx == 0)// Si on allait en haut et que a n-4 on etait à gauche ou en bas
+			if (snake[0].speed.y < 0 && depx == 0)// Si on allait en haut 
 			{
 				if (queueDroite || murDroit())
 					moveLeft();
@@ -655,7 +658,7 @@ void mouvementAuto()
 		else
 			moveUp();
 	}
-	
+
 
 }
 void mouvementManuel()
@@ -663,13 +666,13 @@ void mouvementManuel()
 	if (IsKeyPressed(KEY_RIGHT) && (snake[0].speed.x == 0))
 		moveRight();
 
-	if (IsKeyPressed(KEY_LEFT) && (snake[0].speed.x == 0) )
+	if (IsKeyPressed(KEY_LEFT) && (snake[0].speed.x == 0))
 		moveLeft();
 
-	if (IsKeyPressed(KEY_UP) && (snake[0].speed.y == 0) )
+	if (IsKeyPressed(KEY_UP) && (snake[0].speed.y == 0))
 		moveUp();
 
-	if (IsKeyPressed(KEY_DOWN) && (snake[0].speed.y == 0) )
+	if (IsKeyPressed(KEY_DOWN) && (snake[0].speed.y == 0))
 		moveDown();
 }
 
