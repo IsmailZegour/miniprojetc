@@ -370,45 +370,47 @@ void mouvementAuto()
 				if (queueHaut || murHaut())
 					moveLeft();
 				else
-					moveUp();
+					allowMove = false;
 			} 
 			if (snake[0].speed.y > 0)// si on descendait
 			{
 				if (queueBas || murBas())
 					moveLeft();
 				else
-					moveDown();
+					allowMove = false;
 			}
-
-			if (snake[0].speed.x > 0 && depy == 0) // Si on allait a droite
+			//Prévision a n-10 pour éviter les culs de sac
+			if (snake[0].speed.x > 0 && depy == 0 && snake[0].position.y - snake[10].position.y > 0) // Si on allait a droite en venant du haut a n-4
 			{
 				if (queueBas || murBas())
 					moveUp();
 				else
-					moveDown();
+					moveDown(); // Alors on va essayer de s'eloigner de nos précedentes positions en allant vers le bas en priorité
 			}
 
-			if (snake[0].speed.y == 0 && depy < 0)// Si on se deplace horizontalement et que le fruit est en haut on monte
-				moveUp();
-
-			if (snake[0].speed.y == 0 && depy > 0)// Si on se deplace horizontalement et que le fruit est en bas on descend
-				moveDown();	
-
-
-		}
-		else if (depy == 0 && depx < 0)// Si on est sur la meme ligne et qu'on va à gauche
-		{
-			if (queueHaut || murHaut())
+			if (snake[0].speed.x > 0 && depy == 0) // Si on allait a droite en venant du bas ou de la gauche 
 			{
-				if (queueBas || murBas())
-					moveLeft();
-				else 
+				if (queueHaut || murHaut())
 					moveDown();
+				else
+					moveUp();
 			}
-			else
-				moveUp();
+
+			if (depy == 0 && snake[0].speed.x < 0)// Si on est sur la meme ligne et qu'on va à gauche
+			{
+				if (queueHaut || murHaut())
+				{
+					if (queueBas || murBas())
+						moveLeft();
+					else
+						moveDown();
+				}
+				else
+					moveUp();
+			}
+
 		}
-		else
+		else 
 			moveRight();
 	}
 
@@ -450,36 +452,37 @@ void mouvementAuto()
 					moveDown();
 			}
 
-			if (snake[0].speed.x < 0 && depy == 0) // Si on allait a gauche
+			if (snake[0].speed.x < 0 && depy == 0 && snake[0].position.y -snake[10].position.y > 0) // Si on allait a gauche en venant du haut a n-10
 			{
 				if (queueBas || murBas())
 					moveUp();
 				else
-					moveDown();
+					moveDown(); // Alors on va essayer de s'eloigner de nos précedentes positions en allant vers le bas en priorité
 			}
 
-
-			if (snake[0].speed.y == 0 && depy < 0)// Si on se deplace horizontalement et que le fruit est en haut on monte
-				moveUp();
-
-			if (snake[0].speed.y == 0 && depy > 0)// Si on se deplace horizontalement et que le fruit est en bas on descend
-				moveDown();
-
-
-		}
-		else if (depy == 0 && depx > 0)// Si on est sur la meme ligne et qu'on va à droite
-		{
-			if (queueHaut || murHaut())
+			if (snake[0].speed.x < 0 && depy == 0)// Si on allait a gauche en venant du bas ou de la droite a n-4
 			{
-				if (queueBas || murBas())
-					moveRight();
-				else
+				if (queueHaut || murHaut())
 					moveDown();
+				else
+					moveUp();
 			}
-			else
-				moveUp();
+
+			if (depy == 0 && snake[0].speed.x > 0)// Si on est sur la meme ligne et qu'on va à droite
+			{
+				if (queueHaut || murHaut())
+				{
+					if (queueBas || murBas())
+						moveRight();
+					else
+						moveDown();
+				}
+				else
+					moveUp();
+			}
+
 		}
-		else
+		else 
 			moveLeft();
 	}
 
@@ -511,41 +514,47 @@ void mouvementAuto()
 				if (queueGauche || murGauche())
 					moveUp();
 				else
-					moveLeft();
+					allowMove = false;
 			}
 			if (snake[0].speed.x > 0)// si on allait a droite
 			{
 				if (queueDroite || murDroit())
 					moveUp();
 				else
-					moveRight();
+					allowMove = false;
 			}
-			if (snake[0].speed.y > 0 && depx == 0)// Si on allait en bas
+
+
+
+			// Prevision n-10 ( pour éviter les culs de sac)
+			if (snake[0].speed.y > 0 && depx == 0 && snake[0].position.x - snake[10].position.x < 0)// Si on allait en bas et que l'on vient de la droite (verification etat n-10 arbitrairement)
+			{
+				if (queueGauche || murGauche())
+					moveRight();
+				else
+					moveLeft();// Alors on va essayer de s'eloigner de nos précedentes positions en allant vers la gauche en priorité
+			}
+
+			if (snake[0].speed.y > 0 && depx == 0 )// Sinon on vient de la gauche ou d'en haut
 			{
 				if (queueDroite || murDroit())
 					moveLeft();
 				else
 					moveRight();
 			}
-
-			if (snake[0].speed.x == 0 && depx < 0)// Si on se deplace verticalement et que le fruit est a gauche
-				moveLeft();
-
-			if (snake[0].speed.x == 0 && depx > 0)// Si on se deplace verticalement et que le fruit est droite
-				moveRight();
-
-		}
-		else if (depx == 0 && depy < 0)// Si on est sur la meme colonne et qu'on va en haut
-		{
-			if (queueDroite || murDroit())
+			if (depx == 0 && snake[0].speed.y < 0)// Si on est sur la meme colonne et qu'on va dans le sens contraire
 			{
-				if (queueGauche || murGauche())
-					moveUp();
+				if (queueDroite || murDroit())
+				{
+					if (queueGauche || murGauche())
+						moveDown();
+					else
+						moveLeft();
+				}
 				else
-					moveLeft();
+					moveRight();
 			}
-			else
-				moveRight();
+
 		}
 		else
 			moveDown();
@@ -579,17 +588,25 @@ void mouvementAuto()
 				if (queueGauche || murGauche())
 					moveDown();
 				else
-					moveLeft();
+					allowMove = false;
 			}
 			if (snake[0].speed.x > 0)// si on allait a droite
 			{
 				if (queueDroite || murDroit())
 					moveDown();
 				else
+					allowMove = false;;
+			}
+			// Prevision n-10 ( pour éviter les culs de sac)
+			if (snake[0].speed.y < 0 && depx == 0 && snake[0].position.x - snake[10].position.x < 0)// Si on allait en haut et que l'on vient de la droite (verification etat n-10 arbitrairement)
+			{
+				if (queueGauche || murGauche())
 					moveRight();
+				else
+					moveLeft();// Alors on va essayer de s'eloigner de nos précedentes positions en allant vers la gauche en priorité
 			}
 
-			if (snake[0].speed.y < 0 && depx == 0)// Si on allait en haut
+			if (snake[0].speed.y < 0 && depx == 0)// Si on allait en haut et que a n-4 on etait à gauche ou en bas
 			{
 				if (queueDroite || murDroit())
 					moveLeft();
@@ -597,25 +614,18 @@ void mouvementAuto()
 					moveRight();
 			}
 
-			if (snake[0].speed.x == 0 && depx < 0)// Si on se deplace verticalement et que le fruit est a gauche
-				moveLeft();
-
-			if (snake[0].speed.x == 0 && depx > 0)// Si on se deplace verticalement et que le fruit est droite
-				moveRight();
-
-
-		}
-		else if (depx == 0 && depy > 0)// Si on est sur la meme colonne et qu'on va en bas
-		{
-			if (queueDroite || murDroit())
+			if (depx == 0 && snake[0].speed.y > 0)// Si on est sur la meme colonne et qu'on va dans le sens contraire
 			{
-				if (queueGauche || murGauche())
-					moveDown();
+				if (queueDroite || murDroit())
+				{
+					if (queueGauche || murGauche())
+						moveDown();
+					else
+						moveLeft();
+				}
 				else
-					moveLeft();
+					moveRight();
 			}
-			else
-				moveRight();
 		}
 		else
 			moveUp();
@@ -636,7 +646,6 @@ void snakeMouvement()
 
 	if (IsKeyPressed(KEY_DOWN) && (snake[0].speed.y == 0) )
 		moveDown();
-
 }
 
 //------------------------------------------------------------------------------------
@@ -822,7 +831,7 @@ void UpdateGame(void)
 			if (IsKeyPressed(KEY_W))
 			{
 
-				if (fps < 120)fps += 5;
+				fps += 5;
 				SetTargetFPS(fps);
 			}
 			if (IsKeyPressed(KEY_Q))
