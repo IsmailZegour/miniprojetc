@@ -55,9 +55,7 @@ typedef struct Obstacle {
 // Global Variables Declaration
 //------------------------------------------------------------------------------------
 static const int gameScreenWidth = 800;
-
 static const int screenHeight = 450;
-
 static const int screenWidth = 1000;
 
 
@@ -293,6 +291,353 @@ void menuPrincipal()
 		start = false;
 	}
 }
+void moveRight()
+{
+	if (allowMove) {
+		snake[0].speed = (Vector2){ SQUARE_SIZE, 0 };
+		allowMove = false;
+	}
+}
+void moveLeft()
+{
+	if (allowMove) {
+		snake[0].speed = (Vector2){ -SQUARE_SIZE, 0 };
+		allowMove = false;
+	}
+}
+void moveUp()
+{
+	if (allowMove) {
+		snake[0].speed = (Vector2){ 0, -SQUARE_SIZE };
+		allowMove = false;
+	}
+}
+void moveDown()
+{
+	if (allowMove) {
+		snake[0].speed = (Vector2){ 0, SQUARE_SIZE };
+		allowMove = false;
+	}
+
+}
+bool murHaut()
+{
+	return ((snake[0].position.y-SQUARE_SIZE) < offset.y / 2);
+}
+bool murBas()
+{
+	return (snake[0].position.y+SQUARE_SIZE) > (screenHeight - offset.y);
+}
+bool murDroit()
+{
+	return (snake[0].position.x + SQUARE_SIZE) > (gameScreenWidth - offset.x);
+}
+bool murGauche()
+{
+	return ((snake[0].position.x-SQUARE_SIZE) < offset.x / 2);
+}
+
+void mouvementAuto()
+{
+	float depx = fruit.position.x - snake[0].position.x;
+	float depy = fruit.position.y - snake[0].position.y;
+
+	// Mouvement à droite
+	if (depx > 0 && allowMove) 
+	{
+		bool queueDroite = false;
+		bool queueGauche = false;
+		bool queueBas = false;
+		bool queueHaut = false;
+		for (int i = 1; i < counterTail; i++)// On verifie s'il y a sa queue aux alentours
+		{
+			if (((snake[0].position.x + SQUARE_SIZE == snake[i].position.x)&& (snake[0].position.y == snake[i].position.y))) // Si queue a droite
+				queueDroite = true;
+
+			if (((snake[0].position.x - SQUARE_SIZE == snake[i].position.x) && (snake[0].position.y == snake[i].position.y))) // Si queue a gauche
+				queueGauche = true;
+
+			if (((snake[0].position.x == snake[i].position.x) && (snake[0].position.y + SQUARE_SIZE == snake[i].position.y))) // Si queue en bas
+				queueBas = true;
+
+			if (((snake[0].position.x == snake[i].position.x) && (snake[0].position.y - SQUARE_SIZE == snake[i].position.y))) // Si queue a droite
+				queueHaut = true;
+		}
+		if (queueDroite) //Si queue à droite
+		{
+			if (snake[0].speed.y < 0)// si on montait
+			{
+				if (queueHaut || murHaut())
+					moveLeft();
+				else
+					moveUp();
+			} 
+			if (snake[0].speed.y > 0)// si on descendait
+			{
+				if (queueBas || murBas())
+					moveLeft();
+				else
+					moveDown();
+			}
+
+			if (snake[0].speed.x > 0 && depy == 0) // Si on allait a droite
+			{
+				if (queueBas || murBas())
+					moveUp();
+				else
+					moveDown();
+			}
+
+			if (snake[0].speed.y == 0 && depy < 0)// Si on se deplace horizontalement et que le fruit est en haut on monte
+				moveUp();
+
+			if (snake[0].speed.y == 0 && depy > 0)// Si on se deplace horizontalement et que le fruit est en bas on descend
+				moveDown();	
+
+
+		}
+		else if (depy == 0 && depx < 0)// Si on est sur la meme ligne et qu'on va à gauche
+		{
+			if (queueHaut || murHaut())
+			{
+				if (queueBas || murBas())
+					moveLeft();
+				else 
+					moveDown();
+			}
+			else
+				moveUp();
+		}
+		else
+			moveRight();
+	}
+
+	// Mouvement à gauche
+	if (depx < 0 && allowMove) 
+	{
+		bool queueDroite = false;
+		bool queueGauche = false;
+		bool queueBas = false;
+		bool queueHaut = false;
+		for (int i = 1; i < counterTail; i++)// On verifie s'il y a sa queue aux alentours
+		{
+			if (((snake[0].position.x + SQUARE_SIZE == snake[i].position.x) && (snake[0].position.y == snake[i].position.y))) // Si queue a droite
+				queueDroite = true;
+
+			if (((snake[0].position.x - SQUARE_SIZE == snake[i].position.x) && (snake[0].position.y == snake[i].position.y))) // Si queue a gauche
+				queueGauche = true;
+
+			if (((snake[0].position.x == snake[i].position.x) && (snake[0].position.y + SQUARE_SIZE == snake[i].position.y))) // Si queue en bas
+				queueBas = true;
+
+			if (((snake[0].position.x == snake[i].position.x) && (snake[0].position.y - SQUARE_SIZE == snake[i].position.y))) // Si queue a droite
+				queueHaut = true;
+		}
+		if (queueGauche) //Si queue à gauche
+		{
+			if (snake[0].speed.y < 0)// si on montait
+			{
+				if (queueHaut || murHaut())
+					moveRight();
+				else
+					moveUp();
+			}
+			if (snake[0].speed.y > 0)// si on descendait
+			{
+				if (queueBas|| murBas())
+					moveRight();
+				else
+					moveDown();
+			}
+
+			if (snake[0].speed.x < 0 && depy == 0) // Si on allait a gauche
+			{
+				if (queueBas || murBas())
+					moveUp();
+				else
+					moveDown();
+			}
+
+
+			if (snake[0].speed.y == 0 && depy < 0)// Si on se deplace horizontalement et que le fruit est en haut on monte
+				moveUp();
+
+			if (snake[0].speed.y == 0 && depy > 0)// Si on se deplace horizontalement et que le fruit est en bas on descend
+				moveDown();
+
+
+		}
+		else if (depy == 0 && depx > 0)// Si on est sur la meme ligne et qu'on va à droite
+		{
+			if (queueHaut || murHaut())
+			{
+				if (queueBas || murBas())
+					moveRight();
+				else
+					moveDown();
+			}
+			else
+				moveUp();
+		}
+		else
+			moveLeft();
+	}
+
+	// Mouvement en bas
+	if (depy > 0 && allowMove) 
+	{
+		bool queueDroite = false;
+		bool queueGauche = false;
+		bool queueBas = false;
+		bool queueHaut = false;
+		for (int i = 1; i < counterTail; i++)// On verifie s'il y a sa queue aux alentours
+		{
+			if (((snake[0].position.x + SQUARE_SIZE == snake[i].position.x) && (snake[0].position.y == snake[i].position.y))) // Si queue a droite
+				queueDroite = true;
+
+			if (((snake[0].position.x - SQUARE_SIZE == snake[i].position.x) && (snake[0].position.y == snake[i].position.y))) // Si queue a gauche
+				queueGauche = true;
+
+			if (((snake[0].position.x == snake[i].position.x) && (snake[0].position.y + SQUARE_SIZE == snake[i].position.y))) // Si queue en bas
+				queueBas = true;
+
+			if (((snake[0].position.x == snake[i].position.x) && (snake[0].position.y - SQUARE_SIZE == snake[i].position.y))) // Si queue a droite
+				queueHaut = true;
+		}
+		if (queueBas) //Si queue en bas
+		{
+			if (snake[0].speed.x < 0)// si on allait a gauche
+			{
+				if (queueGauche || murGauche())
+					moveUp();
+				else
+					moveLeft();
+			}
+			if (snake[0].speed.x > 0)// si on allait a droite
+			{
+				if (queueDroite || murDroit())
+					moveUp();
+				else
+					moveRight();
+			}
+			if (snake[0].speed.y > 0 && depx == 0)// Si on allait en bas
+			{
+				if (queueDroite || murDroit())
+					moveLeft();
+				else
+					moveRight();
+			}
+
+			if (snake[0].speed.x == 0 && depx < 0)// Si on se deplace verticalement et que le fruit est a gauche
+				moveLeft();
+
+			if (snake[0].speed.x == 0 && depx > 0)// Si on se deplace verticalement et que le fruit est droite
+				moveRight();
+
+		}
+		else if (depx == 0 && depy < 0)// Si on est sur la meme colonne et qu'on va en haut
+		{
+			if (queueDroite || murDroit())
+			{
+				if (queueGauche || murGauche())
+					moveUp();
+				else
+					moveLeft();
+			}
+			else
+				moveRight();
+		}
+		else
+			moveDown();
+	}
+
+	// Mouvement en haut
+	if (depy < 0 && allowMove)
+	{
+		bool queueDroite = false;
+		bool queueGauche = false;
+		bool queueBas = false;
+		bool queueHaut = false;
+		for (int i = 1; i < counterTail; i++)// On verifie s'il y a sa queue aux alentours
+		{
+			if (((snake[0].position.x + SQUARE_SIZE == snake[i].position.x) && (snake[0].position.y == snake[i].position.y))) // Si queue a droite
+				queueDroite = true;
+
+			if (((snake[0].position.x - SQUARE_SIZE == snake[i].position.x) && (snake[0].position.y == snake[i].position.y))) // Si queue a gauche
+				queueGauche = true;
+
+			if (((snake[0].position.x == snake[i].position.x) && (snake[0].position.y + SQUARE_SIZE == snake[i].position.y))) // Si queue en bas
+				queueBas = true;
+
+			if (((snake[0].position.x == snake[i].position.x) && (snake[0].position.y - SQUARE_SIZE == snake[i].position.y))) // Si queue a droite
+				queueHaut = true;
+		}
+		if (queueHaut) //Si queue en haut
+		{
+			if (snake[0].speed.x < 0)// si on allait a gauche
+			{
+				if (queueGauche || murGauche())
+					moveDown();
+				else
+					moveLeft();
+			}
+			if (snake[0].speed.x > 0)// si on allait a droite
+			{
+				if (queueDroite || murDroit())
+					moveDown();
+				else
+					moveRight();
+			}
+
+			if (snake[0].speed.y < 0 && depx == 0)// Si on allait en haut
+			{
+				if (queueDroite || murDroit())
+					moveLeft();
+				else
+					moveRight();
+			}
+
+			if (snake[0].speed.x == 0 && depx < 0)// Si on se deplace verticalement et que le fruit est a gauche
+				moveLeft();
+
+			if (snake[0].speed.x == 0 && depx > 0)// Si on se deplace verticalement et que le fruit est droite
+				moveRight();
+
+
+		}
+		else if (depx == 0 && depy > 0)// Si on est sur la meme colonne et qu'on va en bas
+		{
+			if (queueDroite || murDroit())
+			{
+				if (queueGauche || murGauche())
+					moveDown();
+				else
+					moveLeft();
+			}
+			else
+				moveRight();
+		}
+		else
+			moveUp();
+	}
+	
+
+}
+void snakeMouvement()
+{
+	if (IsKeyPressed(KEY_RIGHT) && (snake[0].speed.x == 0))
+		moveRight();
+
+	if (IsKeyPressed(KEY_LEFT) && (snake[0].speed.x == 0) )
+		moveLeft();
+
+	if (IsKeyPressed(KEY_UP) && (snake[0].speed.y == 0) )
+		moveUp();
+
+	if (IsKeyPressed(KEY_DOWN) && (snake[0].speed.y == 0) )
+		moveDown();
+
+}
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -386,26 +731,9 @@ void UpdateGame(void)
 		if (!pause)
 		{
 			// Player control
-			if (IsKeyPressed(KEY_RIGHT) && (snake[0].speed.x == 0) && allowMove)
-			{
-				snake[0].speed = (Vector2){ SQUARE_SIZE, 0 };
-				allowMove = false;
-			}
-			if (IsKeyPressed(KEY_LEFT) && (snake[0].speed.x == 0) && allowMove)
-			{
-				snake[0].speed = (Vector2){ -SQUARE_SIZE, 0 };
-				allowMove = false;
-			}
-			if (IsKeyPressed(KEY_UP) && (snake[0].speed.y == 0) && allowMove)
-			{
-				snake[0].speed = (Vector2){ 0, -SQUARE_SIZE };
-				allowMove = false;
-			}
-			if (IsKeyPressed(KEY_DOWN) && (snake[0].speed.y == 0) && allowMove)
-			{
-				snake[0].speed = (Vector2){ 0, SQUARE_SIZE };
-				allowMove = false;
-			}
+			snakeMouvement();
+			mouvementAuto();
+
 
 			// Snake movement
 			for (int i = 0; i < counterTail; i++) snakePosition[i] = snake[i].position;
@@ -491,15 +819,15 @@ void UpdateGame(void)
 				modifierFichierScore();
 				start = true;
 			}
-			if (IsKeyPressed(KEY_W)) 
+			if (IsKeyPressed(KEY_W))
 			{
 
-				if(fps<120)fps += 5;
+				if (fps < 120)fps += 5;
 				SetTargetFPS(fps);
 			}
 			if (IsKeyPressed(KEY_Q))
 			{
-				if(fps>5)fps -= 5;
+				if (fps > 5)fps -= 5;
 				SetTargetFPS(fps);
 			}
 
@@ -518,9 +846,9 @@ void UpdateGame(void)
 		}
 		if (IsKeyPressed(KEY_SEMICOLON)) // Equivalent de la touche [M] en AZERTY
 		{
+			modifierFichierScore();
 			start = true;
 			personnalise = false;
-			gameOver = true;
 		}
 
 	}
@@ -575,11 +903,12 @@ void DrawGame(void)
 		free(bestScoreAffiche);
 
 		//Draw FPS
-		DrawText("[A]- FPS +[Z]", screenWidth - 100 - MeasureText("[A]- FPS +[Z]", 20) / 2, 200, 20, BLACK);
+		DrawText("[A]- VITESSE +[Z]", screenWidth - 100 - MeasureText("[A]- VITESSE +[Z]", 20) / 2, 200, 20, BLACK);
 		const char* fpss = malloc(sizeof(int));
 		convert(fps, fpss);
 		DrawText(fpss, screenWidth - 100 - MeasureText(fpss, 20) / 2, 220, 20, BLACK);
-		
+		free(fpss);
+
 
 		// Draw Obstacle
 		if (avecObstacle) DrawRectangleV(obstacle.position, obstacle.size, obstacle.color);
