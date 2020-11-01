@@ -4,6 +4,10 @@ Extension Snake Raylib
 
 Ce projet est une extension du jeu Snake de RAYLIB. Il implémente le jeu fourni par RAYLIB en y ajoutant quelques fonctionnalités.
 
+COMPILER LE PROGRAMME
+
+Afin de faire compiler le programme, il est conseillé d'utiliser Notepad++ For Raylib, qui inclut les bibliothèques raylib et facilite la compilation.
+
 LANCER LE JEU SNAKE
 
 Afin de lancer le projet, il vous suffit de télécharger "Snake.zip", puis d'exécuter le fichier "snake.exe".
