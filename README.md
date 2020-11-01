@@ -1,4 +1,4 @@
-# miniprojetc
+# PROJET - SNAKE EXTENSION
 Extension Snake Raylib
 
 
