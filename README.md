@@ -4,7 +4,12 @@ Extension Snake Raylib
 
 Ce projet est une extension du jeu Snake de RAYLIB. Il implémente le jeu fourni par RAYLIB en y ajoutant quelques fonctionnalités.
 
-Comment jouer au jeu SNAKE ?
+LANCER LE JEU SNAKE
+
+Afin de lancer le projet, il vous suffit de télécharger "Snake.zip", puis d'exécuter le fichier "snake.exe".
+Pour les utilisateurs de linux, exécuter le projet via la commande wine.
+
+JOUER AU JEU SNAKE 
 
 Ce jeu est très ancien et très connu de par sa simplicité et sa popularité.
 Le joueur guide un serpent sur une map, et le but du jeu est de manger des fruits afin de voir le score et la  taille du serpent augmenter.
