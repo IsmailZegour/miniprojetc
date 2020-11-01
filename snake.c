@@ -94,7 +94,7 @@ static int bestScore = 0;
 static int fps = 30;
 
 //------------------------------------------------------------------------------------
-// Nouvelles fonction implémentées
+// Nouvelles fonction implÃ©mentÃ©es
 //------------------------------------------------------------------------------------
 void convert(int Nb, char* NombreaEcrire)// Converti un int en char* pour l'affichage
 {
@@ -142,12 +142,12 @@ void creerObstacle()
 {
 		obstacle.active = true;
 		obstacle.position = (Vector2){ GetRandomValue(0, (gameScreenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2,
-			GetRandomValue(0, (screenHeight / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.y / 2 }; // On genere une position aléatoire pour l'obstacle
+			GetRandomValue(0, (screenHeight / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.y / 2 }; // On genere une position alÃ©atoire pour l'obstacle
 
 		for (int i = 0; i < counterTail; i++)
 		{
 			while (((obstacle.position.x == snake[i].position.x) && (obstacle.position.y == snake[i].position.y)) ||
-				((obstacle.position.x == fruit.position.x) && (obstacle.position.y == fruit.position.y))) // On vérifie qu'il ne tombe pas sur un fruit ou sur le serpent
+				((obstacle.position.x == fruit.position.x) && (obstacle.position.y == fruit.position.y))) // On vÃ©rifie qu'il ne tombe pas sur un fruit ou sur le serpent
 			{
 				obstacle.position = (Vector2){ GetRandomValue(0, (gameScreenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2,
 					GetRandomValue(0, (screenHeight / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.y / 2 };
@@ -226,7 +226,7 @@ void personnaliser() {
 }
 void lireFichierScore()
 {
-	char* nomFichier = "C:/Users/ismai/Desktop/DossierIsmail/CoursM1/MLOD/LangageC/miniprojet/Snake/score.txt";
+	char* nomFichier = "score.txt";
 	FILE* fichier;
 	fichier = fopen(nomFichier, "r");
 	if (fichier == NULL)
@@ -239,7 +239,7 @@ void lireFichierScore()
 
 }
 void modifierFichierScore() {
-	char* nomFichier = "C:/Users/ismai/Desktop/DossierIsmail/CoursM1/MLOD/LangageC/miniprojet/Snake/score.txt";
+	char* nomFichier = "score.txt";
 	FILE* fichier;
 	fichier = fopen(nomFichier, "r+");
 	fscanf(fichier, "%u\n", &bestScore);
@@ -366,7 +366,7 @@ void mouvementAuto()
 	float depx = fruit.position.x - snake[0].position.x;
 	float depy = fruit.position.y - snake[0].position.y;
 
-	// Mouvement à droite
+	// Mouvement Ã  droite
 	if (depx > 0 && allowMove)
 	{
 		bool queueDroite = false;
@@ -387,7 +387,7 @@ void mouvementAuto()
 			if (((snake[0].position.x == snake[i].position.x) && (snake[0].position.y - SQUARE_SIZE == snake[i].position.y))) // Si queue a droite
 				queueHaut = true;
 		}
-		if (queueDroite || murDroit()) //Si queue ou obstacle à droite
+		if (queueDroite || murDroit()) //Si queue ou obstacle Ã  droite
 		{
 			if (snake[0].speed.y < 0)// si on montait
 			{
@@ -403,13 +403,13 @@ void mouvementAuto()
 				else
 					allowMove = false;
 			}
-			//Prévision pour éviter les culs de sac
+			//PrÃ©vision pour Ã©viter les culs de sac
 			if (snake[0].speed.x > 0 && depy == 0 && snake[0].position.y - snake[counterTail / 2].position.y > 0) // Si on allait a droite en venant du haut a n-4
 			{
 				if (queueBas || murBas())
 					moveUp();
 				else
-					moveDown(); // Alors on va essayer de s'eloigner de nos précedentes positions en allant vers le bas en priorité
+					moveDown(); // Alors on va essayer de s'eloigner de nos prÃ©cedentes positions en allant vers le bas en prioritÃ©
 			}
 
 			if (snake[0].speed.x > 0 && depy == 0) // Si on allait a droite en venant du bas ou de la gauche 
@@ -420,7 +420,7 @@ void mouvementAuto()
 					moveUp();
 			}
 
-			if (depy == 0 && snake[0].speed.x < 0)// Si on est sur la meme ligne et qu'on va à gauche
+			if (depy == 0 && snake[0].speed.x < 0)// Si on est sur la meme ligne et qu'on va Ã  gauche
 			{
 				if (queueHaut || murHaut())
 				{
@@ -438,7 +438,7 @@ void mouvementAuto()
 			moveRight();
 	}
 
-	// Mouvement à gauche
+	// Mouvement Ã  gauche
 	if (depx < 0 && allowMove)
 	{
 		bool queueDroite = false;
@@ -459,7 +459,7 @@ void mouvementAuto()
 			if (((snake[0].position.x == snake[i].position.x) && (snake[0].position.y - SQUARE_SIZE == snake[i].position.y))) // Si queue a droite
 				queueHaut = true;
 		}
-		if (queueGauche || murGauche()) //Si queue ou obstacle à gauche
+		if (queueGauche || murGauche()) //Si queue ou obstacle Ã  gauche
 		{
 			if (snake[0].speed.y < 0)// si on montait
 			{
@@ -481,7 +481,7 @@ void mouvementAuto()
 				if (queueBas || murBas())
 					moveUp();
 				else
-					moveDown(); // Alors on va essayer de s'eloigner de nos précedentes positions en allant vers le bas en priorité
+					moveDown(); // Alors on va essayer de s'eloigner de nos prÃ©cedentes positions en allant vers le bas en prioritÃ©
 			}
 
 			if (snake[0].speed.x < 0 && depy == 0)// Si on allait a gauche en venant du bas ou de la droite a n-4
@@ -492,7 +492,7 @@ void mouvementAuto()
 					moveUp();
 			}
 
-			if (depy == 0 && snake[0].speed.x > 0)// Si on est sur la meme ligne et qu'on va à droite
+			if (depy == 0 && snake[0].speed.x > 0)// Si on est sur la meme ligne et qu'on va Ã  droite
 			{
 				if (queueHaut || murHaut())
 				{
@@ -550,13 +550,13 @@ void mouvementAuto()
 
 
 
-			// Prevision ( pour éviter les culs de sac)
+			// Prevision ( pour Ã©viter les culs de sac)
 			if (snake[0].speed.y > 0 && depx == 0 && snake[0].position.x - snake[counterTail / 2].position.x < 0)// Si on allait en bas et que l'on vient de la droite (verification etat n-10 arbitrairement)
 			{
 				if (queueGauche || murGauche())
 					moveRight();
 				else
-					moveLeft();// Alors on va essayer de s'eloigner de nos précedentes positions en allant vers la gauche en priorité
+					moveLeft();// Alors on va essayer de s'eloigner de nos prÃ©cedentes positions en allant vers la gauche en prioritÃ©
 			}
 
 			if (snake[0].speed.y > 0 && depx == 0)// Sinon on vient de la gauche ou d'en haut
@@ -621,13 +621,13 @@ void mouvementAuto()
 				else
 					allowMove = false;;
 			}
-			// Prevision ( pour éviter les culs de sac)
-			if (snake[0].speed.y < 0 && depx == 0 && snake[0].position.x - snake[counterTail / 2].position.x < 0)// Si on allait en haut et que l'on vient de la droite (verification a la moitié arbitrairement)
+			// Prevision ( pour Ã©viter les culs de sac)
+			if (snake[0].speed.y < 0 && depx == 0 && snake[0].position.x - snake[counterTail / 2].position.x < 0)// Si on allait en haut et que l'on vient de la droite (verification a la moitiÃ© arbitrairement)
 			{
 				if (queueGauche || murGauche())
 					moveRight();
 				else
-					moveLeft();// Alors on va essayer de s'eloigner de nos précedentes positions en allant vers la gauche en priorité
+					moveLeft();// Alors on va essayer de s'eloigner de nos prÃ©cedentes positions en allant vers la gauche en prioritÃ©
 			}
 
 			if (snake[0].speed.y < 0 && depx == 0)// Si on allait en haut 
