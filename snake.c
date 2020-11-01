@@ -140,8 +140,6 @@ void traverserMur()
 }
 void creerObstacle()
 {
-	int i = GetRandomValue(0, 2);
-	if (!i) {
 		obstacle.active = true;
 		obstacle.position = (Vector2){ GetRandomValue(0, (gameScreenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2,
 			GetRandomValue(0, (screenHeight / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.y / 2 }; // On genere une position aléatoire pour l'obstacle
@@ -156,8 +154,6 @@ void creerObstacle()
 				i = 0;
 			}
 		}
-
-	}
 
 }
 void collisionFruit()
