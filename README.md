@@ -43,32 +43,32 @@ TOUCHES
 
 Toute les touches sont encadrés par des [] afin d'indiquer que ce sont des touches de commandes. Exemple pour choisir le niveau de difficulté Facile, on appuie sur [F].
 
-[ESC] : Permet de fermer le jeu.
+-[ESC] : Permet de fermer le jeu.
 
 Menu Principal :
-[F] : Niveau de difficulté FACILE
-[I] : Niveau de difficulté INTERMEDIAIRE
-[D] : Niveau de difficulté DIFFICILE
-[P] : Permet de personnaliser son niveau de difficulté
-[A] : Lance le mode de jeu Automatique, ou l'on regarde le snake se déplacer tout seul.
+-[F] : Niveau de difficulté FACILE
+-[I] : Niveau de difficulté INTERMEDIAIRE
+-[D] : Niveau de difficulté DIFFICILE
+-[P] : Permet de personnaliser son niveau de difficulté
+-[A] : Lance le mode de jeu Automatique, ou l'on regarde le snake se déplacer tout seul.
 
 Menu de personnalisation :
-[O] : Permet d'activer ou de désactiver l'apparition d'obstacle durant la partie.
-[T] : Permet d'activer ou de désactiver la traversée des murs.
-[<>] Flèches du clavier : Permettent de modifier la vitesse de jeu.
-[M] : Retour au menu principal
-[ENTREE] : Lancer la partie avec les paramètres choisis
+-[O] : Permet d'activer ou de désactiver l'apparition d'obstacle durant la partie.
+-[T] : Permet d'activer ou de désactiver la traversée des murs.
+-[<>] Flèches du clavier : Permettent de modifier la vitesse de jeu.
+-[M] : Retour au menu principal
+-[ENTREE] : Lancer la partie avec les paramètres choisis
 
 En jeu:
-[<>] Flèches du clavier : Déplacement du snake pendant la partie
-[P] : Pause
-[M] : Arrêt de la partie et retour au menu principal
-[A] : Permet de diminuer la vitesse de jeu 
-[Z] : Permet d'augmenter la vitesse de jeu (Surtout pour le mode automatique, qui rend le mode satisfaisant).
+-[<>] Flèches du clavier : Déplacement du snake pendant la partie
+-[P] : Pause
+-[M] : Arrêt de la partie et retour au menu principal
+-[A] : Permet de diminuer la vitesse de jeu 
+-[Z] : Permet d'augmenter la vitesse de jeu (Surtout pour le mode automatique, qui rend le mode satisfaisant).
 
 En fin de partie:
-[R] : Permet de relancer la partie
-[M] : Retour au menu principal
+-[R] : Permet de relancer la partie
+-[M] : Retour au menu principal
 
 
 
