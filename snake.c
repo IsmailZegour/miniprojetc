@@ -140,6 +140,7 @@ void traverserMur()
 }
 void creerObstacle()
 {
+
 		obstacle.active = true;
 		obstacle.position = (Vector2){ GetRandomValue(0, (gameScreenWidth / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.x / 2,
 			GetRandomValue(0, (screenHeight / SQUARE_SIZE) - 1) * SQUARE_SIZE + offset.y / 2 }; // On genere une position aléatoire pour l'obstacle
@@ -154,6 +155,7 @@ void creerObstacle()
 				i = 0;
 			}
 		}
+
 
 }
 void collisionFruit()
@@ -231,7 +233,7 @@ void lireFichierScore()
 	fichier = fopen(nomFichier, "r");
 	if (fichier == NULL)
 	{
-		printf("Error opening file %s : %d (%s)\n", nomFichier, errno, strerror(errno));
+		printf("Error opening file score.txt ");
 		exit(1);
 	}
 	fscanf(fichier, "%u\n", &bestScore);
@@ -847,6 +849,7 @@ void UpdateGame(void)
 				gameOver = true;
 				modifierFichierScore();
 				start = true;
+                automatique=false;
 			}
 			if (IsKeyPressed(KEY_W))
 			{
@@ -872,12 +875,15 @@ void UpdateGame(void)
 			gameOver = false;
 			start = false;
 			personnalise = false;
+            automatique=false;
 		}
 		if (IsKeyPressed(KEY_SEMICOLON)) // Equivalent de la touche [M] en AZERTY
 		{
 			modifierFichierScore();
 			start = true;
 			personnalise = false;
+            automatique=false;
+ 
 		}
 
 	}
