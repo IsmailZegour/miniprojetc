@@ -4,9 +4,16 @@ Extension Snake Raylib
 
 Ce projet est une extension du jeu Snake de RAYLIB. Il implémente le jeu fourni par RAYLIB en y ajoutant quelques fonctionnalités.
 
+Note : Tout le code source est contenu dans un seul fichier snake.c (afin de faciliter la compilation).
+
 COMPILER LE PROGRAMME
 
+Je n'ai pas pu trouver de ligne de commande fonctionnelle, je vous mets ci-dessous une ligne de commande qui pourrait vous aider à faire compiler.
+gcc -o snake.exe snake.c C:/raylib/raylib/src/raylib.rc.data -s -static -Os -std=c99 -Wall -Iexternal -DPLATFORM_DESKTOP -L. -L C:/raylib/mingw/i686-w64-mingw32/lib -lraylib -lopengl32 -lgdi32
+
+
 Afin de faire compiler le programme, il est conseillé d'utiliser Notepad++ For Raylib, qui inclut les bibliothèques raylib et facilite la compilation.
+
 
 LANCER LE JEU SNAKE
 
@@ -76,9 +83,6 @@ En fin de partie:
 
 
 
-Fichiers du projet
-
-Le code est contenu dans un seul fichier snake.c qui contient l'intégralité du code.
 
 
 
