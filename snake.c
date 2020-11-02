@@ -967,12 +967,6 @@ void DrawGame(void)
 	EndDrawing();
 }
 
-// Unload game variables
-void UnloadGame(void)
-{
-	// TODO: Unload all dynamic loaded data (textures, sounds, models...)
-}
-
 // Update and Draw (one frame)
 void UpdateDrawFrame(void)
 {
